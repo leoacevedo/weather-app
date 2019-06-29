@@ -1,4 +1,4 @@
-package com.leolei.weather
+package app
 
 import org.junit.Test
 

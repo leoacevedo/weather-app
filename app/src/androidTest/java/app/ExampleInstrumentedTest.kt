@@ -1,4 +1,4 @@
-package com.leolei.weather
+package app
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
