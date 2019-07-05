@@ -7,38 +7,48 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.time.Duration
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import javax.net.SocketFactory
 
 @Module
 class WeatherModule {
     @Provides
     @Singleton
-    fun provideHttpClient(timeoutMillis: Long): OkHttpClient {
-        val duration = Duration.ofMillis(timeoutMillis)
+    fun provideHttpClient(
+        timeoutMillis: Int,
+        @AppId weatherAppId: String,
+        @Units defaultUnits: String
+    ): OkHttpClient {
+        val timeoutLong = timeoutMillis.toLong()
+
         return OkHttpClient.Builder()
-            .callTimeout(duration)
-            .connectTimeout(duration)
-            .readTimeout(duration)
-            .writeTimeout(duration)
+            .callTimeout(timeoutLong, TimeUnit.MILLISECONDS)
+            .connectTimeout(timeoutLong, TimeUnit.MILLISECONDS)
+            .readTimeout(timeoutLong, TimeUnit.MILLISECONDS)
+            .writeTimeout(timeoutLong, TimeUnit.MILLISECONDS)
             .addInterceptor { chain ->
                 val request = chain.request()
                 val newRequest = request.newBuilder()
+                    .url(
+                        request.url().newBuilder()
+                            .addQueryParameter("appid", weatherAppId)
+                            .addQueryParameter("units", defaultUnits)
+                            .build()
+                    )
+                    .build()
 
-                chain.proceed(newRequest.build())
+                chain.proceed(newRequest)
             }
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideRestService(
-        baseUrl: String,
-        httpClient: OkHttpClient
-    ): RestService {
+    fun provideRestService(@BaseUrl  baseUrl: String, httpClient: OkHttpClient): RestService {
         return Retrofit.Builder()
             .client(httpClient)
-            .baseUrl("")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(RestService::class.java)
