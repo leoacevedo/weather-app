@@ -1,1 +1,1 @@
-include ':app', ':model' , ':usecases'
+include ':app', ':model' , ':usecases', ':interfaceadapters'
