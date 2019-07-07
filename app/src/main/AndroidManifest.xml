@@ -33,6 +33,11 @@
                     android:resource="@xml/search"
             />
         </activity>
+
+        <meta-data
+                android:name="com.google.android.geo.API_KEY"
+                android:value="@string/maps_key" />
+
     </application>
 
 </manifest>

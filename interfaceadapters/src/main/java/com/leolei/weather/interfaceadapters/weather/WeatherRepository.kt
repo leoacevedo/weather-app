@@ -14,6 +14,8 @@ class WeatherRepository(
             return Forecast(
                 date = System.currentTimeMillis(),
                 cityName = restForecast.cityName,
+                latitude = restForecast.coordinates.latitude,
+                longitude = restForecast.coordinates.longitude,
                 temperatureCelsius = temperature,
                 minTemperatureCelsius = minTemperature,
                 maxTemperatureCelsius = maxTemperature,

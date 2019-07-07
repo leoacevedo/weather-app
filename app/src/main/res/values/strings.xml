@@ -2,7 +2,12 @@
     <string name="app_name">Weather</string>
     <string name="base_url" translatable="false">https://api.openweathermap.org/</string>
     <string name="weather_app_id" translatable="false">1531f7b8fa24cac9ce367ba1ae3a19d3</string>
+    <string name="maps_key" translatable="false">AIzaSyBwVl9A3czf2SYtqBi1VR5gtRv8eHKMzho</string>
     <string name="default_units">metric</string>
     <string name="search">Search</string>
     <string name="search_hint">Enter city name</string>
+    <string name="unknown_error">There was an error. Please retry.</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="map">Map</string>
+    <string name="celsius" formatted="false">%1$s°C</string>
 </resources>

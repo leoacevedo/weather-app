@@ -26,10 +26,10 @@ data class RestForecast(
 
 data class Coordinates(
     @SerializedName("lon")
-    val longitude: String,
+    val longitude: Double,
 
     @SerializedName("lat")
-    val latitude: String
+    val latitude: Double
 )
 
 data class WeatherProperty(
