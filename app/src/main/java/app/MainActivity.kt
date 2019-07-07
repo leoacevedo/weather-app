@@ -8,9 +8,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.widget.SearchView
+import com.leolei.mvp.WeatherPresenter
+import com.leolei.mvp.WeatherView
+import com.leolei.weather.model.Forecast
 import dagger.android.AndroidInjection
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), WeatherView {
+    @Inject
+    lateinit var presenter: WeatherPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +45,30 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+    override fun onStart() {
+        super.onStart()
+        presenter.onShowing(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.onHiding()
+    }
+
     private fun searchPreviousResults(queryString: String) {
 
+    }
+
+    override fun showLoading() {
+    }
+
+    override fun hideLoading() {
+    }
+
+    override fun render(forecast: Forecast) {
+    }
+
+    override fun render(error: Throwable) {
     }
 
     }
