@@ -3,4 +3,6 @@
     <string name="base_url" translatable="false">https://api.openweathermap.org/</string>
     <string name="weather_app_id" translatable="false">1531f7b8fa24cac9ce367ba1ae3a19d3</string>
     <string name="default_units">metric</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Enter city name</string>
 </resources>
