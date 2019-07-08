@@ -4,7 +4,7 @@ import app.App
 import com.leolei.weather.interfaceadapters.weather.di.AppId
 import com.leolei.weather.interfaceadapters.weather.di.BaseUrl
 import com.leolei.weather.interfaceadapters.weather.di.Units
-import com.leolei.weather.interfaceadapters.weather.di.WeatherModule
+import app.weather.di.WeatherModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector

@@ -1,12 +1,12 @@
-package com.leolei.weather.interfaceadapters.weather
+package app.weather.repo
 
+import com.leolei.weather.WeatherRepository
 import com.leolei.weather.interfaceadapters.weather.rest.RestService
 import com.leolei.weather.model.Forecast
-import com.leolei.weather.usecases.GetForecastUseCase
 
-class WeatherRepository(
+class WeatherRepositoryImpl(
     private val restService: RestService
-) : GetForecastUseCase {
+) : WeatherRepository {
     override suspend fun getForecast(city: String): Forecast {
         val restForecast = restService.getForecast(city)
 

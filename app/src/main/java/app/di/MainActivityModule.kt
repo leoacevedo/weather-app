@@ -2,7 +2,7 @@ package app.di
 
 import com.leolei.mvp.WeatherPresenter
 import com.leolei.mvp.WeatherPresenterImpl
-import com.leolei.weather.interfaceadapters.weather.WeatherRepository
+import com.leolei.weather.WeatherRepository
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.Dispatchers

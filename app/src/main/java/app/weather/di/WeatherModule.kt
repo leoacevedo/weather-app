@@ -1,6 +1,10 @@
-package com.leolei.weather.interfaceadapters.weather.di
+package app.weather.di
 
-import com.leolei.weather.interfaceadapters.weather.WeatherRepository
+import app.weather.repo.WeatherRepositoryImpl
+import com.leolei.weather.WeatherRepository
+import com.leolei.weather.interfaceadapters.weather.di.AppId
+import com.leolei.weather.interfaceadapters.weather.di.BaseUrl
+import com.leolei.weather.interfaceadapters.weather.di.Units
 import com.leolei.weather.interfaceadapters.weather.rest.RestService
 import dagger.Module
 import dagger.Provides
@@ -9,7 +13,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
-import javax.net.SocketFactory
 
 @Module
 class WeatherModule {
@@ -45,7 +48,7 @@ class WeatherModule {
 
     @Provides
     @Singleton
-    fun provideRestService(@BaseUrl  baseUrl: String, httpClient: OkHttpClient): RestService {
+    fun provideRestService(@BaseUrl baseUrl: String, httpClient: OkHttpClient): RestService {
         return Retrofit.Builder()
             .client(httpClient)
             .baseUrl(baseUrl)
@@ -57,6 +60,6 @@ class WeatherModule {
     @Provides
     @Singleton
     fun provideWeatherRepository(restService: RestService): WeatherRepository {
-        return WeatherRepository(restService)
+        return WeatherRepositoryImpl(restService)
     }
 }

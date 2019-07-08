@@ -1,6 +1,6 @@
 package com.leolei.mvp
 
-import com.leolei.weather.interfaceadapters.weather.WeatherRepository
+import com.leolei.weather.WeatherRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
