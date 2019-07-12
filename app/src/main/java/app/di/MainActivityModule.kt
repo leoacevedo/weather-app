@@ -1,5 +1,6 @@
 package app.di
 
+import com.leolei.cities.history.CityHistoryRepository
 import com.leolei.mvp.WeatherPresenter
 import com.leolei.mvp.WeatherPresenterImpl
 import com.leolei.weather.WeatherRepository
@@ -12,7 +13,10 @@ import javax.inject.Singleton
 class MainActivityModule {
     @Singleton
     @Provides
-    fun provideWeatherPresenter(repo: WeatherRepository): WeatherPresenter {
-        return WeatherPresenterImpl(Dispatchers.IO, repo)
+    fun provideWeatherPresenter(
+        weatherRepo: WeatherRepository,
+        cityHistoryRepo: CityHistoryRepository
+    ): WeatherPresenter {
+        return WeatherPresenterImpl(Dispatchers.IO, weatherRepo, cityHistoryRepo)
     }
 }

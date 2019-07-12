@@ -5,4 +5,5 @@ interface WeatherPresenter {
     fun onHiding()
 
     fun getForecast(city: String)
+    fun removeCityFromHistory(city: String)
 }

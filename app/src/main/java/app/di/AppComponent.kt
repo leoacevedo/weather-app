@@ -1,6 +1,7 @@
 package app.di
 
 import app.App
+import app.cities.history.di.CityHistoryModule
 import com.leolei.weather.interfaceadapters.weather.di.AppId
 import com.leolei.weather.interfaceadapters.weather.di.BaseUrl
 import com.leolei.weather.interfaceadapters.weather.di.Units
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 @Component(modules = [
     WeatherModule::class,
     ActivityInjector::class,
+    CityHistoryModule::class,
     MainActivityModule::class,
     AndroidSupportInjectionModule::class
 ])
