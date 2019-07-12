@@ -1,5 +1,6 @@
 package app
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -7,10 +8,12 @@ import android.view.Menu
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.inputmethod.InputMethodManager
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import app.cities.history.ui.CityHistoryAdapter
+import app.cities.history.ui.WeatherAdapter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -31,7 +34,8 @@ class MainActivity : AppCompatActivity(), WeatherView {
     private lateinit var mapFragment: SupportMapFragment
     private lateinit var searchView: SearchView
     private lateinit var autoCompleteTextView: AutoCompleteTextView
-    private lateinit var adapter: CityHistoryAdapter
+    private lateinit var cityAdapter: CityHistoryAdapter
+    private lateinit var weatherAdapter: WeatherAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +53,9 @@ class MainActivity : AppCompatActivity(), WeatherView {
                 this.setAllGesturesEnabled(false)
             }
         }
+
+        weatherAdapter = WeatherAdapter(this)
+        weatherVariables.adapter = weatherAdapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -60,8 +67,8 @@ class MainActivity : AppCompatActivity(), WeatherView {
             queryHint = getString(R.string.search_hint)
 
             autoCompleteTextView = this.findViewById(R.id.search_src_text)
-            if (::adapter.isInitialized && autoCompleteTextView.adapter != adapter) {
-                autoCompleteTextView.setAdapter(adapter)
+            if (::cityAdapter.isInitialized && autoCompleteTextView.adapter != cityAdapter) {
+                autoCompleteTextView.setAdapter(cityAdapter)
             }
             autoCompleteTextView.threshold = 1
 
@@ -79,7 +86,7 @@ class MainActivity : AppCompatActivity(), WeatherView {
                 override fun onSuggestionSelect(position: Int) = false
 
                 override fun onSuggestionClick(position: Int): Boolean {
-                    val query = adapter.data[position]
+                    val query = cityAdapter.data[position]
                     autoCompleteTextView.setText(query)
                     autoCompleteTextView.dismissDropDown()
                     searchPreviousResults(query)
@@ -121,9 +128,28 @@ class MainActivity : AppCompatActivity(), WeatherView {
 
     override fun render(forecast: Forecast) {
         runOnUiThread {
+            val titleTemperature = getString(R.string.temperature)
+            val titleMinTemperature = getString(R.string.min_temperature)
+            val titleMaxTemperature = getString(R.string.max_temperature)
+            val titleHumidity = getString(R.string.humidity)
+            val titlePressure = getString(R.string.pressure)
+
             with(forecast) {
-                degrees.text = getString(R.string.celsius, temperatureCelsius.toString())
-                city.text = cityName
+                val valueTemperature = getString(R.string.celsius, temperatureCelsius.toString())
+                val valueMinTemperature = getString(R.string.celsius, minTemperatureCelsius.toString())
+                val valueMaxTemperature = getString(R.string.celsius, maxTemperatureCelsius.toString())
+                val valueHumidity = getString(R.string.percent, humidity.toString())
+                val valuePressure = getString(R.string.hectopascals, pressureHpa.toString())
+
+                weatherAdapter.data = listOf(
+                    titleTemperature to valueTemperature,
+                    titleMinTemperature to valueMinTemperature,
+                    titleMaxTemperature to valueMaxTemperature,
+                    titleHumidity to valueHumidity,
+                    titlePressure to valuePressure
+                )
+
+                screenTitle.text = getString(R.string.forecast_for_city_of, cityName)
                 mapFragment.getMapAsync { map ->
                     map.clear()
                     val latLng = LatLng(latitude, longitude)
@@ -135,6 +161,9 @@ class MainActivity : AppCompatActivity(), WeatherView {
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 5.5f))
                 }
             }
+
+            val imeService = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imeService.hideSoftInputFromWindow(autoCompleteTextView.windowToken, 0)
         }
     }
 
@@ -152,10 +181,10 @@ class MainActivity : AppCompatActivity(), WeatherView {
 
     override fun updateCitySuggestions(cities: List<String>) {
         runOnUiThread {
-            adapter = CityHistoryAdapter(this, cities)
-            adapter.removeCityListener = ::removeCity
+            cityAdapter = CityHistoryAdapter(this, cities)
+            cityAdapter.removeCityListener = ::removeCity
             if (::autoCompleteTextView.isInitialized) {
-                autoCompleteTextView.setAdapter(adapter)
+                autoCompleteTextView.setAdapter(cityAdapter)
             }
         }
     }

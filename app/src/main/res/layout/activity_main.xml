@@ -13,50 +13,37 @@
             android:layout_height="match_parent"
             tools:context=".MainActivity">
 
-        <ImageView
-                android:id="@+id/icon"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+        <TextView
+                android:id="@+id/screenTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/initial_title"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textStyle="bold"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
-                android:padding="2dp"
-                android:src="@null"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-        />
-
-        <TextView
-                android:id="@+id/city"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                tools:text="Ciudad Autónoma de Bunenos Aires o algo más largo como una palabra en alemán "
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                app:layout_constraintStart_toEndOf="@id/icon"
+                android:textSize="20sp"
+                android:gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:textSize="18sp"
                 app:layout_constraintTop_toTopOf="parent"
+
         />
 
-        <TextView
-                android:id="@+id/degrees"
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/weatherVariables"
+                app:layout_constraintStart_toStartOf="@id/screenTitle"
+                app:layout_constraintEnd_toEndOf="@id/screenTitle"
+                app:layout_constraintTop_toBottomOf="@id/screenTitle"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                tools:text="8°C"
-                android:textSize="24sp"
-                app:layout_constraintTop_toBottomOf="@id/city"
-                app:layout_constraintBottom_toBottomOf="@id/icon"
-                app:layout_constraintStart_toEndOf="@id/icon"
-                app:layout_constraintStart_toStartOf="@id/city"
-                app:layout_constraintEnd_toEndOf="@id/city"
-                android:gravity="start|center_vertical"
-        />
+                android:layout_height="wrap_content" />
 
         <TextView
                 android:id="@+id/map_title"
@@ -69,7 +56,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/icon"
+                app:layout_constraintTop_toBottomOf="@id/weatherVariables"
                 app:layout_constraintBottom_toTopOf="@+id/map"
         />
         <fragment
@@ -89,7 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/gray_overlay"
-                tools:visibility="gone">
+                android:visibility="gone">
             <ProgressBar
                     android:id="@+id/loadingIndicator"
                     android:layout_width="wrap_content"

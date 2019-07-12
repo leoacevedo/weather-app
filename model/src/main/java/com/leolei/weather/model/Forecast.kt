@@ -8,6 +8,6 @@ data class Forecast(
     val temperatureCelsius: Double,
     val minTemperatureCelsius: Double,
     val maxTemperatureCelsius: Double,
-    val pressureMmHg: Double,
+    val pressureHpa: Double,
     val humidity: Double
 )

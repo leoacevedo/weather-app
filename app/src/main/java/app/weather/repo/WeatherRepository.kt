@@ -19,7 +19,7 @@ class WeatherRepositoryImpl(
                 temperatureCelsius = temperature,
                 minTemperatureCelsius = minTemperature,
                 maxTemperatureCelsius = maxTemperature,
-                pressureMmHg = pressure,
+                pressureHpa = pressure,
                 humidity = humidity
             )
         }
