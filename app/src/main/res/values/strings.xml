@@ -9,14 +9,18 @@
     <string name="unknown_error">There was an error. Please retry.</string>
     <string name="dismiss">Dismiss</string>
     <string name="map">Map</string>
-    <string name="celsius" formatted="false">%1$s°C</string>
+    <string name="celsius" formatted="false">%1$.2f°C</string>
+    <string name="fahrenheit" formatted="false">%1$.2f°F</string>
     <string name="temperature">Temperature</string>
     <string name="forecast_for_city_of">Forecast for %1$s</string>
     <string name="min_temperature">Min. temperature</string>
     <string name="max_temperature">Max. temperature</string>
     <string name="pressure">Pressure</string>
-    <string name="hectopascals">%1$s hPa</string>
+    <string name="hectopascals">%1$.2f hPa</string>
     <string name="humidity">Humidity</string>
-    <string name="percent">%1$s%%</string>
+    <string name="percent">%1$.2f%%</string>
     <string name="initial_title">Search for your city from the title bar</string>
+    <string name="units_imperial">Imperial units</string>
+    <string name="units_metric">Metric units</string>
+    <string name="inHg">%1$.2f\"Hg</string>
 </resources>

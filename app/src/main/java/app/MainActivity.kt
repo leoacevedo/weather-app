@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -13,6 +14,7 @@ import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import app.cities.history.ui.CityHistoryAdapter
+import app.cities.history.ui.ParcelizableForecast
 import app.cities.history.ui.WeatherAdapter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
@@ -37,6 +39,9 @@ class MainActivity : AppCompatActivity(), WeatherView {
     private lateinit var cityAdapter: CityHistoryAdapter
     private lateinit var weatherAdapter: WeatherAdapter
 
+    private var metricUnits = true
+    private var forecast: ParcelizableForecast? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -56,6 +61,19 @@ class MainActivity : AppCompatActivity(), WeatherView {
 
         weatherAdapter = WeatherAdapter(this)
         weatherVariables.adapter = weatherAdapter
+
+        savedInstanceState?.let {
+            metricUnits = it.getBoolean(METRIC_UNITS)
+            forecast = it.getParcelable(FORECAST)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(METRIC_UNITS, metricUnits)
+        forecast?.let {
+            outState.putParcelable(FORECAST, it)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -103,6 +121,18 @@ class MainActivity : AppCompatActivity(), WeatherView {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.units) {
+            metricUnits = !metricUnits
+            item.title = when (metricUnits) {
+                false -> getString(R.string.units_metric)
+                true -> getString(R.string.units_imperial)
+            }
+            forecast?.let { render(it) }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onStart() {
         super.onStart()
         presenter.onShowing(this)
@@ -127,6 +157,12 @@ class MainActivity : AppCompatActivity(), WeatherView {
     }
 
     override fun render(forecast: Forecast) {
+        val parcelizableForecast = ParcelizableForecast(forecast)
+        this.forecast = parcelizableForecast
+        render(parcelizableForecast)
+    }
+
+    private fun render(forecast: ParcelizableForecast) {
         runOnUiThread {
             val titleTemperature = getString(R.string.temperature)
             val titleMinTemperature = getString(R.string.min_temperature)
@@ -135,11 +171,14 @@ class MainActivity : AppCompatActivity(), WeatherView {
             val titlePressure = getString(R.string.pressure)
 
             with(forecast) {
-                val valueTemperature = getString(R.string.celsius, temperatureCelsius.toString())
-                val valueMinTemperature = getString(R.string.celsius, minTemperatureCelsius.toString())
-                val valueMaxTemperature = getString(R.string.celsius, maxTemperatureCelsius.toString())
-                val valueHumidity = getString(R.string.percent, humidity.toString())
-                val valuePressure = getString(R.string.hectopascals, pressureHpa.toString())
+                val valueTemperature =
+                    getString(getTemperatureResId(), temperatureCelsius.toTemperatureUnit())
+                val valueMinTemperature =
+                    getString(getTemperatureResId(), minTemperatureCelsius.toTemperatureUnit())
+                val valueMaxTemperature =
+                    getString(getTemperatureResId(), maxTemperatureCelsius.toTemperatureUnit())
+                val valueHumidity = getString(R.string.percent, humidity)
+                val valuePressure = getString(getPressureResId(), pressureHpa.toPressureUnit())
 
                 weatherAdapter.data = listOf(
                     titleTemperature to valueTemperature,
@@ -168,6 +207,8 @@ class MainActivity : AppCompatActivity(), WeatherView {
     }
 
     override fun render(error: Throwable) {
+        this.forecast = null
+
         runOnUiThread {
             val errorMessage = error.message ?: getString(R.string.unknown_error)
             Snackbar.make(root, errorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -201,5 +242,22 @@ class MainActivity : AppCompatActivity(), WeatherView {
 
     private fun View.hide() {
         runOnUiThread { visibility = GONE }
+    }
+
+    private fun getTemperatureResId() = if (metricUnits) R.string.celsius else R.string.fahrenheit
+
+    private fun getPressureResId() = if (metricUnits) R.string.hectopascals else R.string.inHg
+
+    private fun Double.toTemperatureUnit(): Double {
+        return if (metricUnits) this else this * 9 / 5 + 32
+    }
+
+    private fun Double.toPressureUnit(): Double {
+        return if (metricUnits) this else this * 0.029529988
+    }
+
+    companion object {
+        const val METRIC_UNITS = "metric_units"
+        const val FORECAST = "forecast"
     }
 }
