@@ -1,9 +1,5 @@
 package app
 
-import android.app.SearchManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -11,8 +7,10 @@ import android.view.Menu
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import app.cities.history.ui.CityHistoryAdapter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -31,6 +29,9 @@ class MainActivity : AppCompatActivity(), WeatherView {
 
     private var snackbar: Snackbar? = null
     private lateinit var mapFragment: SupportMapFragment
+    private lateinit var searchView: SearchView
+    private lateinit var autoCompleteTextView: AutoCompleteTextView
+    private lateinit var adapter: CityHistoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,37 +44,61 @@ class MainActivity : AppCompatActivity(), WeatherView {
         loadingIndicator.indeterminateDrawable = progressDrawable
         mapFragment = map as SupportMapFragment
 
-        mapFragment.getMapAsync { with(it.uiSettings) {
-            this.setAllGesturesEnabled(false)
-        }}
+        mapFragment.getMapAsync {
+            with(it.uiSettings) {
+                this.setAllGesturesEnabled(false)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
 
-        val componentName = ComponentName(this, MainActivity::class.java)
-        val searchService = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchableInfo = searchService.getSearchableInfo(componentName)
-        val searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
-        searchView.setSearchableInfo(searchableInfo)
+        menu.findItem(R.id.app_bar_search).actionView.apply {
+            this as SearchView
 
-        return super.onCreateOptionsMenu(menu)
-    }
+            queryHint = getString(R.string.search_hint)
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
+            autoCompleteTextView = this.findViewById(R.id.search_src_text)
+            if (::adapter.isInitialized && autoCompleteTextView.adapter != adapter) {
+                autoCompleteTextView.setAdapter(adapter)
+            }
+            autoCompleteTextView.threshold = 1
 
-        val queryString = intent.extras?.getString(SearchManager.QUERY)
-        if (queryString != null) {
-            searchPreviousResults(queryString)
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextChange(newText: String?) = true
+
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    autoCompleteTextView.dismissDropDown()
+                    searchPreviousResults(query)
+                    return true
+                }
+            })
+
+            setOnSuggestionListener(object : SearchView.OnSuggestionListener {
+                override fun onSuggestionSelect(position: Int) = false
+
+                override fun onSuggestionClick(position: Int): Boolean {
+                    val query = adapter.data[position]
+                    autoCompleteTextView.setText(query)
+                    autoCompleteTextView.dismissDropDown()
+                    searchPreviousResults(query)
+                    return true
+                }
+            })
+
+            autoCompleteTextView.setOnClickListener {
+                autoCompleteTextView.showDropDown()
+            }
+
+            searchView = this
         }
-
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onStart() {
         super.onStart()
         presenter.onShowing(this)
-        presenter.getForecast("Montevideo")
     }
 
     override fun onStop() {
@@ -83,7 +108,7 @@ class MainActivity : AppCompatActivity(), WeatherView {
     }
 
     private fun searchPreviousResults(queryString: String) {
-
+        presenter.getForecast(queryString)
     }
 
     override fun showLoading() {
@@ -107,7 +132,7 @@ class MainActivity : AppCompatActivity(), WeatherView {
                         .title(cityName)
                         .position(latLng)
                     map.addMarker(marker)
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 4f))
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 5.5f))
                 }
             }
         }
@@ -123,6 +148,22 @@ class MainActivity : AppCompatActivity(), WeatherView {
                     it.show()
                 }
         }
+    }
+
+    override fun updateCitySuggestions(cities: List<String>) {
+        runOnUiThread {
+            adapter = CityHistoryAdapter(this, cities)
+            adapter.removeCityListener = ::removeCity
+            if (::autoCompleteTextView.isInitialized) {
+                autoCompleteTextView.setAdapter(adapter)
+            }
+        }
+    }
+
+    private fun removeCity(city: String) {
+        runOnUiThread { autoCompleteTextView.dismissDropDown() }
+
+        presenter.removeCityFromHistory(city)
     }
 
     private fun View.show() {

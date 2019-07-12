@@ -8,4 +8,6 @@ interface WeatherView {
 
     fun render(forecast: Forecast)
     fun render(error: Throwable)
+
+    fun updateCitySuggestions(cities: List<String>)
 }

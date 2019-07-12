@@ -5,7 +5,7 @@
     <string name="maps_key" translatable="false">AIzaSyBwVl9A3czf2SYtqBi1VR5gtRv8eHKMzho</string>
     <string name="default_units">metric</string>
     <string name="search">Search</string>
-    <string name="search_hint">Enter city name</string>
+    <string name="search_hint">Search city</string>
     <string name="unknown_error">There was an error. Please retry.</string>
     <string name="dismiss">Dismiss</string>
     <string name="map">Map</string>
